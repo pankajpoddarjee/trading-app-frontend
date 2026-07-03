@@ -129,32 +129,40 @@ const Portfolio: React.FC = () => {
   };
 
   const handleSell = async () => {
-    if (!selectedHolding) return;
-    if (sellData.quantity <= 0 || sellData.sellPrice <= 0) {
-      alert("Please enter valid quantity and price");
-      return;
-    }
-    if (sellData.quantity > selectedHolding.quantity) {
-      alert(`You only have ${selectedHolding.quantity} shares`);
-      return;
-    }
+  if (!selectedHolding) return;
+  if (sellData.quantity <= 0 || sellData.sellPrice <= 0) {
+    alert("Please enter valid quantity and price");
+    return;
+  }
+  if (sellData.quantity > selectedHolding.quantity) {
+    alert(`You only have ${selectedHolding.quantity} shares`);
+    return;
+  }
 
-    try {
-      await sellHolding({
-        symbol: selectedHolding.symbol,
-        quantity: sellData.quantity,
-        sellPrice: sellData.sellPrice,
-      });
-      
-      await fetchHoldings();
-      await fetchTransactions();
-      setShowSellModal(false);
-      setSelectedHolding(null);
-      setSellData({ symbol: "", quantity: 0, sellPrice: 0 });
-    } catch (error: any) {
-      alert(error.response?.data?.message || "Failed to sell");
-    }
-  };
+  // ✅ Confirmation Dialog
+  const totalAmount = sellData.quantity * sellData.sellPrice;
+  const confirmMessage = `Are you sure you want to SELL ${sellData.quantity} shares of ${selectedHolding.symbol} at ₹${sellData.sellPrice.toFixed(2)}?\n\nTotal Amount: ₹${totalAmount.toFixed(2)}`;
+  
+  if (!window.confirm(confirmMessage)) {
+    return; // User cancelled
+  }
+
+  try {
+    await sellHolding({
+      symbol: selectedHolding.symbol,
+      quantity: sellData.quantity,
+      sellPrice: sellData.sellPrice,
+    });
+    
+    await fetchHoldings();
+    await fetchTransactions();
+    setShowSellModal(false);
+    setSelectedHolding(null);
+    setSellData({ symbol: "", quantity: 0, sellPrice: 0 });
+  } catch (error: any) {
+    alert(error.response?.data?.message || "Failed to sell");
+  }
+};
 
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to remove this holding?")) {
