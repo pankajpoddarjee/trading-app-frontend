@@ -12,7 +12,8 @@ import {
   BarChart3, 
   Star, 
   Newspaper, 
-  Gift 
+  Gift,
+  FileText
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen }: any) => {
@@ -25,7 +26,7 @@ const Sidebar = ({ isOpen }: any) => {
     { icon: History, label: 'Transactions', path: '/transactions' },
     { icon: Star, label: 'Watchlist', path: '/watchlist' },
     { icon: Newspaper, label: 'News', path: '/news' },
-    { icon: Briefcase, label: 'Portfolio', path: '/portfolio' },
+    { icon: FileText, label: 'Reports', path: '/reports' },
   ];
   const bottom = [
     { icon: Wallet, label: 'Wallet', path: '/wallet' },

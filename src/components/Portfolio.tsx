@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminLayout from "./Layout/AdminLayout";
 import { Plus, TrendingUp, TrendingDown, Trash2, Eye, X, Search, TrendingUp as SellIcon } from "lucide-react";
-import { getPortfolio, addHolding, deleteHolding, updatePrice, sellHolding, getTransactions } from "../api/api";
+import { getPortfolio, addHolding, deleteHolding, updatePrice, sellHolding, getTransactions, searchMasterStocks, addMasterStock } from "../api/api";
 
 interface Holding {
   id: number;
@@ -22,6 +22,7 @@ interface Transaction {
   price: number;
   total_amount: number;
   created_at: string;
+  transaction_date: string; 
 }
 
 const Portfolio: React.FC = () => {
@@ -34,17 +35,27 @@ const Portfolio: React.FC = () => {
     totalPnl: 0,
     totalPnlPercent: 0,
   });
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showAddMasterModal, setShowAddMasterModal] = useState(false);
+  const [newMasterStock, setNewMasterStock] = useState({ symbol: '', companyName: '', sector: '', exchange: 'NSE' });
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSellModal, setShowSellModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedHolding, setSelectedHolding] = useState<Holding | null>(null);
-  const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy'); // ✅ Active tab state
+  const [activeTab, setActiveTab] = useState<'buy' | 'sell'>('buy');
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
+  
   const [sellData, setSellData] = useState({
     symbol: "",
     quantity: 0,
     sellPrice: 0,
+    transactionDate: new Date().toISOString().split('T')[0],// ✅ Add
   });
   const [formData, setFormData] = useState({
     symbol: "",
@@ -52,6 +63,7 @@ const Portfolio: React.FC = () => {
     quantity: 1,
     buyPrice: 0,
     currentPrice: 0,
+    transactionDate: new Date().toISOString().split('T')[0], // ✅ Transaction Date
   });
 
   useEffect(() => {
@@ -94,13 +106,65 @@ const Portfolio: React.FC = () => {
       setLoading(false);
     }
   };
+  const handleAddMasterStock = async () => {
+    if (!newMasterStock.symbol || !newMasterStock.companyName) {
+      alert("Please enter symbol and company name");
+      return;
+    }
 
+    try {
+      await addMasterStock({
+        symbol: newMasterStock.symbol.toUpperCase(),
+        companyName: newMasterStock.companyName,
+        sector: newMasterStock.sector || 'Others',
+        exchange: newMasterStock.exchange || 'NSE',
+      });
+      
+      // ✅ CRITICAL: Update formData
+      setFormData({
+        ...formData,
+        symbol: newMasterStock.symbol.toUpperCase(),
+        companyName: newMasterStock.companyName,
+      });
+      
+      setSearchQuery(`${newMasterStock.symbol} - ${newMasterStock.companyName}`);
+      setShowAddMasterModal(false);
+      setNewMasterStock({ symbol: '', companyName: '', sector: '', exchange: 'NSE' });
+      
+      alert("Stock added to master successfully!");
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Failed to add stock");
+    }
+  };
   const fetchTransactions = async () => {
     try {
       const response = await getTransactions();
       setTransactions(response.data || []);
     } catch (error) {
       console.error("Error fetching transactions:", error);
+    }
+  };
+
+  // Search stocks from master
+  const handleStockSearch = async (query: string) => {
+    setSearchQuery(query);
+    if (query.length < 1) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const response = await searchMasterStocks(query);
+      console.log("🔍 Search Response:", response.data);
+      setSearchResults(response.data || []);
+      setShowSearchResults(true);
+    } catch (error) {
+      console.error("Search error:", error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -117,12 +181,22 @@ const Portfolio: React.FC = () => {
         quantity: formData.quantity,
         buyPrice: formData.buyPrice,
         currentPrice: formData.currentPrice || formData.buyPrice,
+        transactionDate: formData.transactionDate || new Date().toISOString().split('T')[0],
       });
       
       await fetchHoldings();
       await fetchTransactions();
       setShowAddModal(false);
-      setFormData({ symbol: "", companyName: "", quantity: 1, buyPrice: 0, currentPrice: 0 });
+      setFormData({ 
+        symbol: "", 
+        companyName: "", 
+        quantity: 1, 
+        buyPrice: 0, 
+        currentPrice: 0,
+        transactionDate: new Date().toISOString().split('T')[0],
+      });
+      setSearchQuery('');
+      setSearchResults([]);
     } catch (error: any) {
       alert(error.response?.data?.message || "Failed to add holding");
     }
@@ -139,12 +213,11 @@ const Portfolio: React.FC = () => {
     return;
   }
 
-  // ✅ Confirmation Dialog
   const totalAmount = sellData.quantity * sellData.sellPrice;
   const confirmMessage = `Are you sure you want to SELL ${sellData.quantity} shares of ${selectedHolding.symbol} at ₹${sellData.sellPrice.toFixed(2)}?\n\nTotal Amount: ₹${totalAmount.toFixed(2)}`;
   
   if (!window.confirm(confirmMessage)) {
-    return; // User cancelled
+    return;
   }
 
   try {
@@ -152,13 +225,19 @@ const Portfolio: React.FC = () => {
       symbol: selectedHolding.symbol,
       quantity: sellData.quantity,
       sellPrice: sellData.sellPrice,
+      transactionDate: sellData.transactionDate || new Date().toISOString().split('T')[0], // ✅ Add
     });
     
     await fetchHoldings();
     await fetchTransactions();
     setShowSellModal(false);
     setSelectedHolding(null);
-    setSellData({ symbol: "", quantity: 0, sellPrice: 0 });
+    setSellData({ 
+      symbol: "", 
+      quantity: 0, 
+      sellPrice: 0,
+      transactionDate: new Date().toISOString().split('T')[0], // ✅ Add
+    });
   } catch (error: any) {
     alert(error.response?.data?.message || "Failed to sell");
   }
@@ -176,39 +255,48 @@ const Portfolio: React.FC = () => {
     }
   };
 
-  const handleUpdatePrice = (id: number, newPrice: number) => {
-    // Update local state
+  
+
+  const handlePriceBlur = (id: number, e: React.FocusEvent<HTMLInputElement>) => {
+    const newPrice = parseFloat(e.target.value) || 0;
+    if (newPrice <= 0) {
+      alert("Price must be greater than 0");
+      fetchHoldings();
+      return;
+    }
+    
     setHoldings(prev => 
       prev.map(h => 
         h.id === id ? { ...h, current_price: newPrice } : h
       )
     );
     
-    // Save to DB after delay
-    setTimeout(async () => {
-      try {
-        await updatePrice(id, newPrice);
-        await fetchHoldings();
-      } catch (error) {
+    updatePrice(id, newPrice)
+      .then(() => fetchHoldings())
+      .catch((error) => {
         console.error("Failed to update price:", error);
-      }
-    }, 1000);
+        fetchHoldings();
+      });
   };
 
   const openSellModal = (holding: Holding) => {
-    setSelectedHolding(holding);
-    setSellData({ symbol: holding.symbol, quantity: 1, sellPrice: holding.current_price });
-    setShowSellModal(true);
-  };
+  setSelectedHolding(holding);
+  setSellData({ 
+    symbol: holding.symbol, 
+    quantity: 1, 
+    sellPrice: holding.current_price,
+    transactionDate: new Date().toISOString().split('T')[0], // ✅ Add
+  });
+  setShowSellModal(true);
+};
 
   const openDetailModal = (holding: Holding) => {
     console.log("🔍 Opening detail for:", holding);
     setSelectedHolding(holding);
-    setActiveTab('buy'); // ✅ Reset to buy tab when opening
+    setActiveTab('buy');
     setShowDetailModal(true);
   };
 
-  // Get all transactions for a specific symbol
   const getSymbolTransactions = (symbol: string, type?: 'BUY' | 'SELL') => {
     if (!transactions || !Array.isArray(transactions)) {
       return [];
@@ -302,8 +390,8 @@ const Portfolio: React.FC = () => {
                         <input
                           type="number"
                           className="portfolio-price-input"
-                          value={h.current_price}
-                          onChange={(e) => handleUpdatePrice(h.id, parseFloat(e.target.value) || 0)}
+                          defaultValue={h.current_price}
+                          onBlur={(e) => handlePriceBlur(h.id, e)}
                           step="0.01"
                         />
                       </td>
@@ -372,6 +460,15 @@ const Portfolio: React.FC = () => {
                   min="0"
                 />
               </div>
+              <div className="portfolio-modal-group">
+                <label className="portfolio-modal-label">Transaction Date</label>
+                <input
+                  type="date"
+                  className="portfolio-modal-input"
+                  value={sellData.transactionDate}
+                  onChange={(e) => setSellData({ ...sellData, transactionDate: e.target.value })}
+                />
+              </div>
               <div className="portfolio-modal-total">
                 <span>Total Amount</span>
                 <span>₹{(sellData.quantity * sellData.sellPrice).toFixed(2)}</span>
@@ -400,7 +497,6 @@ const Portfolio: React.FC = () => {
               </button>
             </div>
             <div className="portfolio-modal-body">
-              {/* Summary Cards */}
               <div className="detail-summary">
                 <div className="detail-summary-item">
                   <span>Total Shares</span>
@@ -422,7 +518,6 @@ const Portfolio: React.FC = () => {
                 </div>
               </div>
 
-              {/* Buy & Sell History Tabs */}
               <div className="detail-tabs">
                 <button 
                   className={`detail-tab ${activeTab === 'buy' ? 'active' : ''}`}
@@ -438,7 +533,6 @@ const Portfolio: React.FC = () => {
                 </button>
               </div>
 
-              {/* Buy History */}
               {activeTab === 'buy' && (
                 <div className="detail-buy-history">
                   {getSymbolTransactions(selectedHolding.symbol, 'BUY').length === 0 ? (
@@ -447,7 +541,7 @@ const Portfolio: React.FC = () => {
                     <table className="detail-history-table">
                       <thead>
                         <tr>
-                          <th>Date</th>
+                          <th>Transaction Date</th>
                           <th>Quantity</th>
                           <th>Price</th>
                           <th>Total</th>
@@ -458,7 +552,7 @@ const Portfolio: React.FC = () => {
                           const price = typeof t.price === 'number' ? t.price : parseFloat(String(t.price)) || 0;
                           const totalAmount = typeof t.total_amount === 'number' ? t.total_amount : parseFloat(String(t.total_amount)) || 0;
                           const quantity = typeof t.quantity === 'number' ? t.quantity : parseInt(String(t.quantity)) || 0;
-                          const date = t.created_at ? new Date(t.created_at).toLocaleDateString('en-IN') : 'N/A';
+                          const date = t.transaction_date ? new Date(t.transaction_date).toLocaleDateString('en-IN') : 'N/A'; // ✅ created_at → transaction_date
                           
                           return (
                             <tr key={t.id}>
@@ -475,7 +569,6 @@ const Portfolio: React.FC = () => {
                 </div>
               )}
 
-              {/* Sell History */}
               {activeTab === 'sell' && (
                 <div className="detail-buy-history">
                   {getSymbolTransactions(selectedHolding.symbol, 'SELL').length === 0 ? (
@@ -484,7 +577,7 @@ const Portfolio: React.FC = () => {
                     <table className="detail-history-table">
                       <thead>
                         <tr>
-                          <th>Date</th>
+                          <th>Transaction Date</th>
                           <th>Quantity</th>
                           <th>Price</th>
                           <th>Total</th>
@@ -495,7 +588,7 @@ const Portfolio: React.FC = () => {
                           const price = typeof t.price === 'number' ? t.price : parseFloat(String(t.price)) || 0;
                           const totalAmount = typeof t.total_amount === 'number' ? t.total_amount : parseFloat(String(t.total_amount)) || 0;
                           const quantity = typeof t.quantity === 'number' ? t.quantity : parseInt(String(t.quantity)) || 0;
-                          const date = t.created_at ? new Date(t.created_at).toLocaleDateString('en-IN') : 'N/A';
+                          const date = t.transaction_date ? new Date(t.transaction_date).toLocaleDateString('en-IN') : 'N/A'; // ✅ created_at → transaction_date
                           
                           return (
                             <tr key={t.id}>
@@ -521,32 +614,93 @@ const Portfolio: React.FC = () => {
         </div>
       )}
 
+      
+
       {/* Add Modal */}
       {showAddModal && (
         <div className="portfolio-modal-overlay" onClick={() => setShowAddModal(false)}>
           <div className="portfolio-modal" onClick={(e) => e.stopPropagation()}>
             <h2 className="portfolio-modal-title">Add New Holding</h2>
             <div className="portfolio-modal-form">
+
+              {/* ✅ Search Stock */}
               <div className="portfolio-modal-group">
-                <label className="portfolio-modal-label">Symbol</label>
+                <label className="portfolio-modal-label">Search Stock</label>
+                <div className="stock-search-wrapper" style={{ position: 'relative', width: '100%' }}>
+                  <input
+                    type="text"
+                    className="portfolio-modal-input"
+                    style={{ width: '100%' }}
+                    placeholder="Search by symbol or company name..."
+                    value={searchQuery}
+                    onChange={(e) => handleStockSearch(e.target.value)}
+                  />
+                  {isSearching && <div className="search-loader">...</div>}
+                  
+                  {showSearchResults && searchResults.length > 0 && (
+                    <div className="stock-search-results" style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100 }}>
+                      {searchResults.map((stock) => (
+                        <div 
+                          key={stock.id}
+                          className="stock-search-result"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              symbol: stock.symbol,
+                              companyName: stock.company_name,
+                            });
+                            setSearchQuery(`${stock.symbol} - ${stock.company_name}`);
+                            setShowSearchResults(false);
+                            setSearchResults([]);
+                          }}
+                        >
+                          <span className="stock-search-result-symbol">{stock.symbol}</span>
+                          <span className="stock-search-result-name">{stock.company_name}</span>
+                          <span className="stock-search-result-exchange">{stock.exchange}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {showSearchResults && searchResults.length === 0 && (
+                    <div className="stock-search-results" style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100 }}>
+                      <div className="stock-search-no-result">
+                        <span>No stock found</span>
+                        <button 
+                          className="stock-search-add-btn"
+                          onClick={() => {
+                            setNewMasterStock({ 
+                              symbol: searchQuery.toUpperCase(), 
+                              companyName: '', 
+                              sector: '', 
+                              exchange: 'NSE' 
+                            });
+                            setShowAddMasterModal(true);
+                            setShowSearchResults(false);
+                          }}
+                        >
+                          + Add "{searchQuery}" to Master
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              
+
+              {/* ✅ Transaction Date */}
+              <div className="portfolio-modal-group">
+                <label className="portfolio-modal-label">Transaction Date</label>
                 <input
-                  type="text"
+                  type="date"
                   className="portfolio-modal-input"
-                  placeholder="e.g., AAPL"
-                  value={formData.symbol}
-                  onChange={(e) => setFormData({ ...formData, symbol: e.target.value.toUpperCase() })}
+                  value={formData.transactionDate}
+                  onChange={(e) => setFormData({ ...formData, transactionDate: e.target.value })}
                 />
               </div>
-              <div className="portfolio-modal-group">
-                <label className="portfolio-modal-label">Company Name</label>
-                <input
-                  type="text"
-                  className="portfolio-modal-input"
-                  placeholder="e.g., Apple Inc."
-                  value={formData.companyName}
-                  onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                />
-              </div>
+
+              {/* ✅ Quantity */}
               <div className="portfolio-modal-group">
                 <label className="portfolio-modal-label">Quantity</label>
                 <input
@@ -557,6 +711,8 @@ const Portfolio: React.FC = () => {
                   min="1"
                 />
               </div>
+
+              {/* ✅ Buy Price */}
               <div className="portfolio-modal-group">
                 <label className="portfolio-modal-label">Buy Price (₹)</label>
                 <input
@@ -568,6 +724,8 @@ const Portfolio: React.FC = () => {
                   min="0"
                 />
               </div>
+
+              {/* ✅ Current Price */}
               <div className="portfolio-modal-group">
                 <label className="portfolio-modal-label">Current Price (₹)</label>
                 <input
@@ -580,6 +738,7 @@ const Portfolio: React.FC = () => {
                   placeholder="Same as buy price if not updated"
                 />
               </div>
+
             </div>
             <div className="portfolio-modal-actions">
               <button className="portfolio-modal-cancel" onClick={() => setShowAddModal(false)}>
@@ -587,6 +746,73 @@ const Portfolio: React.FC = () => {
               </button>
               <button className="portfolio-modal-save" onClick={handleAddHolding}>
                 Add Holding
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Master Stock Modal */}
+      {showAddMasterModal && (
+        <div className="portfolio-modal-overlay" onClick={() => setShowAddMasterModal(false)}>
+          <div className="portfolio-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="portfolio-modal-header">
+              <h2 className="portfolio-modal-title">Add Stock to Master</h2>
+              <button className="portfolio-modal-close" onClick={() => setShowAddMasterModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className="portfolio-modal-body">
+              <div className="portfolio-modal-group">
+                <label className="portfolio-modal-label">Symbol</label>
+                <input
+                  type="text"
+                  className="portfolio-modal-input"
+                  value={newMasterStock.symbol}
+                  onChange={(e) => setNewMasterStock({ ...newMasterStock, symbol: e.target.value.toUpperCase() })}
+                  placeholder="e.g., AAPL"
+                />
+              </div>
+              <div className="portfolio-modal-group">
+                <label className="portfolio-modal-label">Company Name</label>
+                <input
+                  type="text"
+                  className="portfolio-modal-input"
+                  value={newMasterStock.companyName}
+                  onChange={(e) => setNewMasterStock({ ...newMasterStock, companyName: e.target.value })}
+                  placeholder="e.g., Apple Inc."
+                />
+              </div>
+              <div className="portfolio-modal-group">
+                <label className="portfolio-modal-label">Sector</label>
+                <input
+                  type="text"
+                  className="portfolio-modal-input"
+                  value={newMasterStock.sector}
+                  onChange={(e) => setNewMasterStock({ ...newMasterStock, sector: e.target.value })}
+                  placeholder="e.g., Technology"
+                />
+              </div>
+              <div className="portfolio-modal-group">
+                <label className="portfolio-modal-label">Exchange</label>
+                <select
+                  className="portfolio-modal-input"
+                  value={newMasterStock.exchange}
+                  onChange={(e) => setNewMasterStock({ ...newMasterStock, exchange: e.target.value })}
+                >
+                  <option value="NSE">NSE</option>
+                  <option value="BSE">BSE</option>
+                  <option value="NASDAQ">NASDAQ</option>
+                  <option value="NYSE">NYSE</option>
+                </select>
+              </div>
+            </div>
+            <div className="portfolio-modal-actions">
+              <button className="portfolio-modal-cancel" onClick={() => setShowAddMasterModal(false)}>
+                Cancel
+              </button>
+              <button className="portfolio-modal-save" onClick={handleAddMasterStock}>
+                Add to Master
               </button>
             </div>
           </div>

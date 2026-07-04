@@ -47,4 +47,8 @@ export const deleteHolding = (id: number) => api.delete(`/portfolio/delete/${id}
 export const updatePrice = (id: number, currentPrice: number) => api.put(`/portfolio/price/${id}`, { currentPrice });
 export const getTransactions = () => api.get('/portfolio/transactions');
 
+// ============ MASTER STOCK APIs ============
+export const searchMasterStocks = (query: string) => api.get(`/master/search?q=${query}`);
+export const addMasterStock = (data: any) => api.post('/master/add', data);
+
 export default api;

@@ -1843,12 +1843,12 @@ html, body {
   color: #ffffff;
 }
 
-.portfolio-modal-title {
+/* .portfolio-modal-title {
   font-size: 20px;
   font-weight: 700;
   color: #ffffff;
   margin: 0;
-}
+} */
 
 .portfolio-modal-body {
   margin-bottom: 20px;
@@ -2067,6 +2067,346 @@ html, body {
 .detail-tab.active {
   color: #818cf8;
   background: rgba(99, 102, 241, 0.12);
+}
+
+/* ============================================================
+   REPORTS PAGE CSS
+   ============================================================ */
+.reports-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.reports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.reports-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.reports-subtitle {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.reports-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.reports-print-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #e5e7eb;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.reports-print-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Tabs */
+.reports-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.reports-tab {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.reports-tab:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.reports-tab.active {
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.12);
+}
+
+/* Summary Cards */
+.reports-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.reports-summary-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+
+.reports-summary-label {
+  font-size: 11px;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.reports-summary-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+  margin-top: 4px;
+}
+
+.reports-summary-value.positive {
+  color: #34d399;
+}
+
+.reports-summary-value.negative {
+  color: #ef4444;
+}
+
+/* Table */
+.reports-table-container {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.reports-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.reports-table-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.reports-download-btn {
+  padding: 6px 14px;
+  background: rgba(99, 102, 241, 0.15);
+  border: none;
+  border-radius: 6px;
+  color: #818cf8;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.reports-download-btn:hover {
+  background: rgba(99, 102, 241, 0.25);
+}
+
+.reports-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reports-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6c757d;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.reports-table td {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #e5e7eb;
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.reports-table .positive {
+  color: #34d399;
+}
+
+.reports-table .negative {
+  color: #ef4444;
+}
+
+.reports-empty {
+  text-align: center;
+  color: #6c757d;
+  padding: 30px;
+}
+
+/* Filter */
+.reports-filter {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.reports-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reports-filter-group label {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.reports-filter-input {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+}
+
+.reports-filter-input:focus {
+  border-color: #6366f1;
+}
+
+.reports-filter-btn {
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  color: #9ca3af;
+  cursor: pointer;
+}
+
+.reports-filter-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .reports-tabs {
+    flex-direction: column;
+  }
+  .reports-summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .reports-table {
+    font-size: 12px;
+  }
+  .reports-table th,
+  .reports-table td {
+    padding: 6px 10px;
+  }
+}
+
+/* Stock Search */
+.stock-search-wrapper {
+  position: relative;
+  width: 100%; /* ✅ Full width */
+}
+
+.stock-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  margin-top: 4px;
+  display: block; /* ✅ Ensure it's visible */
+}
+
+.stock-search-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.stock-search-result:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stock-search-result-symbol {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.stock-search-result-name {
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.stock-search-result-exchange {
+  color: #6c757d;
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.stock-search-no-result {
+  padding: 12px 14px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+.stock-search-add-btn {
+  display: block;
+  margin: 8px auto 0;
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border: none;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.stock-search-add-btn:hover {
+  transform: scale(1.02);
 }
 @media (max-width: 768px) {
   .dash-content {
