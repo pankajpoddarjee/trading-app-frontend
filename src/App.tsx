@@ -6,6 +6,8 @@ import Profile from './components/Profile';
 import BuySell from './components/BuySell';
 import Portfolio from './components/Portfolio';
 import Reports from './components/Reports';
+import BulkBuy from './components/BulkBuy';
+import MasterStocks from './components/MasterStocks';
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/sell" element={<BuySell />} />
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/bulk-buy" element={<BulkBuy />} />
+        <Route path="/master-stocks" element={<MasterStocks />} />
       </Routes>
     </BrowserRouter>
   );

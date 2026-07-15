@@ -2408,6 +2408,414 @@ html, body {
 .stock-search-add-btn:hover {
   transform: scale(1.02);
 }
+
+
+/* ============================================================
+   BULK BUY CSS
+   ============================================================ */
+.bulk-buy-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.bulk-buy-header {
+  margin-bottom: 24px;
+}
+
+.bulk-buy-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.bulk-buy-subtitle {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.bulk-buy-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.bulk-buy-date {
+  margin-bottom: 16px;
+}
+
+.bulk-buy-label {
+  font-size: 12px;
+  color: #6c757d;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.bulk-buy-input {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+}
+
+.bulk-buy-input:focus {
+  border-color: #6366f1;
+}
+
+.bulk-buy-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 16px 0;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.bulk-buy-row {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.bulk-buy-row-number {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+.bulk-buy-row-fields {
+  display: grid;
+  grid-template-columns: 1fr 70px 90px 90px 80px 30px;
+  gap: 8px;
+  align-items: end;
+}
+
+.bulk-buy-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bulk-buy-field .bulk-buy-label {
+  font-size: 10px;
+  color: #6c757d;
+}
+
+.search-wrapper {
+  position: relative;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 100;
+  margin-top: 4px;
+}
+
+.search-result-item {
+  padding: 6px 10px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  transition: background 0.2s;
+}
+
+.search-result-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.search-result-symbol {
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 13px;
+}
+
+.search-result-name {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+.bulk-buy-total {
+  font-weight: 600;
+  color: #818cf8;
+  font-size: 14px;
+  padding: 8px 0;
+}
+
+.bulk-buy-remove {
+  background: transparent;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  padding: 4px;
+  margin-bottom: 4px;
+}
+
+.bulk-buy-remove:hover {
+  color: #ef4444;
+}
+
+.bulk-buy-add-row {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #9ca3af;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.bulk-buy-add-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: #ffffff;
+}
+
+.bulk-buy-submit {
+  width: 100%;
+  padding: 12px;
+  margin-top: 16px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border: none;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bulk-buy-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.25);
+}
+
+.bulk-buy-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bulk-buy-message {
+  padding: 12px 16px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.bulk-buy-message.success {
+  background: rgba(52, 211, 153, 0.1);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  color: #34d399;
+}
+
+.bulk-buy-message.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .bulk-buy-row-fields {
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .bulk-buy-field.total-field {
+    grid-column: span 2;
+  }
+}
+
+/* ============================================================
+   MASTER STOCKS CSS
+   ============================================================ */
+.master-stocks-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.master-stocks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.master-stocks-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.master-stocks-subtitle {
+  font-size: 14px;
+  color: #6c757d;
+}
+
+.master-stocks-add-btn {
+  padding: 8px 18px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.master-stocks-add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.25);
+}
+
+.master-stocks-search {
+  margin-bottom: 16px;
+}
+
+.master-stocks-search .search-wrapper {
+  position: relative;
+  max-width: 400px;
+}
+
+.master-stocks-search .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+}
+
+.master-stocks-search .search-input {
+  width: 100%;
+  padding: 10px 12px 10px 38px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+}
+
+.master-stocks-search .search-input:focus {
+  border-color: #6366f1;
+}
+
+.master-stocks-search .search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.master-stocks-table-container {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+.master-stocks-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.master-stocks-table th {
+  padding: 12px 16px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6c757d;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.master-stocks-table td {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #e5e7eb;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.master-stocks-table .symbol-cell {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.master-stocks-table .empty-row {
+  text-align: center;
+  color: #6c757d;
+  padding: 30px;
+}
+
+.status-badge {
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.active {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.status-badge.inactive {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.action-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  margin-right: 4px;
+}
+
+.action-btn.edit {
+  color: #fbbf24;
+}
+
+.action-btn.edit:hover {
+  background: rgba(251, 191, 36, 0.15);
+}
+
+.action-btn.delete {
+  color: #ef4444;
+}
+
+.action-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
 @media (max-width: 768px) {
   .dash-content {
     padding: 16px;

@@ -50,5 +50,15 @@ export const getTransactions = () => api.get('/portfolio/transactions');
 // ============ MASTER STOCK APIs ============
 export const searchMasterStocks = (query: string) => api.get(`/master/search?q=${query}`);
 export const addMasterStock = (data: any) => api.post('/master/add', data);
+export const getAllMasterStocks = () => api.get('/master');
+export const updateMasterStock = (id: number, data: any) => api.put(`/master/update/${id}`, data);
+export const deleteMasterStock = (id: number) => api.delete(`/master/delete/${id}`);
+// ============ BULK PORTFOLIO APIs ============
+export const getBulkPortfolio = () => api.get('/bulk-portfolio');
+export const addBulkHoldings = (data: any) => api.post('/bulk-portfolio/add-bulk', data);
+export const deleteBulkHolding = (id: number) => api.delete(`/bulk-portfolio/delete/${id}`);
+
+
+
 
 export default api;

@@ -13,7 +13,8 @@ import {
   Star, 
   Newspaper, 
   Gift,
-  FileText
+  FileText,
+  Database
 } from 'lucide-react';
 
 const Sidebar = ({ isOpen }: any) => {
@@ -27,6 +28,8 @@ const Sidebar = ({ isOpen }: any) => {
     { icon: Star, label: 'Watchlist', path: '/watchlist' },
     { icon: Newspaper, label: 'News', path: '/news' },
     { icon: FileText, label: 'Reports', path: '/reports' },
+    { icon: Database, label: 'Bulk Buy', path: '/bulk-buy' },
+    { icon: Database, label: 'Master Stocks', path: '/master-stocks' },
   ];
   const bottom = [
     { icon: Wallet, label: 'Wallet', path: '/wallet' },
